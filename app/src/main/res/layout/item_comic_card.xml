@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="140dp"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_marginEnd="12dp">
+
+    <!-- Comic Cover -->
+    <ImageView
+        android:id="@+id/imgComic"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scaleType="centerCrop"
+        android:background="#BDBDBD"/>
+
+    <!-- Comic Name -->
+    <TextView
+        android:id="@+id/tvComicName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Comic Name"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_marginTop="6dp"/>
+
+    <!-- Progress Bar -->
+    <ProgressBar
+        android:id="@+id/progressRead"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:layout_marginTop="4dp"
+        android:progress="50"/>
+
+</LinearLayout>
