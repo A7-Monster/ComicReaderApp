@@ -28,7 +28,7 @@
             android:layout_height="180dp"
             android:layout_marginTop="12dp"/>
 
-        </HorizontalScrollView>
+
 
         <!-- Reading Streak Title -->
         <TextView
