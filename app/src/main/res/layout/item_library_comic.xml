@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:orientation="vertical"
+    android:layout_margin="8dp">
+
+    <ImageView
+        android:id="@+id/imgComic"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="#BDBDBD"/>
+
+    <TextView
+        android:id="@+id/tvComicName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Comic"
+        android:textSize="14sp"
+        android:textColor="#000"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:layout_marginTop="6dp"/>
+
+</LinearLayout>

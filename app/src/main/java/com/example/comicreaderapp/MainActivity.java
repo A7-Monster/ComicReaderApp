@@ -14,10 +14,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // ⭐ This line is VERY IMPORTANT
         setContentView(R.layout.activity_main);
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
+        // ⭐ Load Home First
         loadFragment(new HomeFragment());
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
