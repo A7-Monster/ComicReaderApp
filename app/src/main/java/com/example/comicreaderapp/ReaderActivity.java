@@ -1,9 +1,10 @@
 package com.example.comicreaderapp;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -12,6 +13,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class ReaderActivity extends AppCompatActivity {
 
@@ -26,7 +33,7 @@ public class ReaderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_reader);
 
         // ⭐ Get URI
-        comicUri = getIntent().getParcelableExtra("uri");
+        comicUri = Uri.parse(getIntent().getStringExtra("uri"));
 
         if (comicUri == null) {
             finish();
@@ -48,36 +55,14 @@ public class ReaderActivity extends AppCompatActivity {
         // ⭐ Recycler
         recycler = findViewById(R.id.recyclerPages);
 
-        // ⭐ IMPORTANT → SET DEFAULT MODE FIRST (VERY IMPORTANT)
+        // ⭐ DEFAULT MODE
         recycler.setLayoutManager(
                 new LinearLayoutManager(this,
                         LinearLayoutManager.VERTICAL, false)
         );
 
-        // ⭐ TEMP Adapter (Dummy Pages)
-        recycler.setAdapter(new RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-            @Override
-            public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-                TextView tv = new TextView(parent.getContext());
-                tv.setTextColor(0xffffffff);
-                tv.setTextSize(32);
-                tv.setPadding(80, 400, 80, 400);
-
-                return new RecyclerView.ViewHolder(tv) {};
-            }
-
-            @Override
-            public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-                ((TextView) holder.itemView).setText("Page " + (position + 1));
-            }
-
-            @Override
-            public int getItemCount() {
-                return 20;
-            }
-        });
+        // ⭐ LOAD REAL CBZ
+        loadCBZ();
 
         // ⭐ Mode Buttons
         TextView btnVertical = findViewById(R.id.btnVertical);
@@ -100,6 +85,50 @@ public class ReaderActivity extends AppCompatActivity {
         });
 
         showReadingModeDialog();
+    }
+
+    private void loadCBZ() {
+
+        new Thread(() -> {
+
+            try {
+
+                List<ComicPage> pages = new ArrayList<>();
+
+                InputStream is = getContentResolver().openInputStream(comicUri);
+
+                ZipInputStream zis = new ZipInputStream(is);
+
+                ZipEntry entry;
+
+                while ((entry = zis.getNextEntry()) != null) {
+
+                    String name = entry.getName().toLowerCase();
+
+                    if (name.endsWith(".jpg") ||
+                            name.endsWith(".jpeg") ||
+                            name.endsWith(".png") ||
+                            name.endsWith(".webp")) {
+
+                        Bitmap bmp = BitmapFactory.decodeStream(zis);
+
+                        if (bmp != null) {
+                            pages.add(new ComicPage(bmp));
+                        }
+                    }
+
+                    zis.closeEntry();
+                }
+
+                runOnUiThread(() -> {
+                    recycler.setAdapter(new PageAdapter(pages));
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }).start();
     }
 
     private void showReadingModeDialog() {
