@@ -13,9 +13,16 @@ import java.util.List;
 public class LibraryAdapter extends RecyclerView.Adapter<LibraryAdapter.ViewHolder> {
 
     List<LibraryComic> comics;
+    OnComicClickListener listener;
 
-    public LibraryAdapter(List<LibraryComic> comics) {
+    // ⭐ CLICK INTERFACE
+    public interface OnComicClickListener {
+        void onComicClick(LibraryComic comic);
+    }
+
+    public LibraryAdapter(List<LibraryComic> comics, OnComicClickListener listener) {
         this.comics = comics;
+        this.listener = listener;
     }
 
     @NonNull
@@ -30,7 +37,14 @@ public class LibraryAdapter extends RecyclerView.Adapter<LibraryAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.title.setText(comics.get(position).getTitle());
+
+        LibraryComic comic = comics.get(position);
+
+        holder.title.setText(comic.getTitle());
+
+        holder.itemView.setOnClickListener(v -> {
+            listener.onComicClick(comic);
+        });
     }
 
     @Override

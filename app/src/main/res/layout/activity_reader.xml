@@ -1,17 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/readerRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="#000">
 
-    <TextView
-        android:id="@+id/tvComicTitle"
-        android:layout_width="wrap_content"
+    <!-- ⭐ Pages Recycler -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerPages"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <!-- ⭐ Reading Mode Menu Overlay -->
+    <LinearLayout
+        android:id="@+id/layoutMenu"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Comic"
-        android:textColor="#FFFFFF"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        android:layout_gravity="center"/>
+        android:orientation="vertical"
+        android:background="#AA000000"
+        android:padding="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:text="Choose Reading Mode"
+            android:textColor="#fff"
+            android:textSize="18sp"
+            android:layout_marginBottom="12dp"/>
+
+        <TextView
+            android:id="@+id/btnVertical"
+            android:text="Vertical Scroll"
+            android:textColor="#fff"
+            android:textSize="16sp"
+            android:padding="8dp"/>
+
+        <TextView
+            android:id="@+id/btnHorizontal"
+            android:text="Horizontal Swipe"
+            android:textColor="#fff"
+            android:textSize="16sp"
+            android:padding="8dp"/>
+
+    </LinearLayout>
+
+    <!-- ⭐ Bottom Progress -->
+    <LinearLayout
+        android:id="@+id/layoutProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:background="#AA000000"
+        android:padding="8dp">
+
+        <SeekBar
+            android:id="@+id/seekPages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/tvPage"
+            android:text="1 / 14"
+            android:textColor="#fff"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
 
 </FrameLayout>
