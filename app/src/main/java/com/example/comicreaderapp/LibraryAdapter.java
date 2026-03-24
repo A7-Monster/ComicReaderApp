@@ -1,12 +1,9 @@
 package com.example.comicreaderapp;
 
-import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,9 +13,17 @@ import java.util.List;
 public class LibraryAdapter extends RecyclerView.Adapter<LibraryAdapter.ViewHolder> {
 
     List<LibraryComic> comics;
+    OnComicClickListener listener;
 
-    public LibraryAdapter(List<LibraryComic> comics) {
+    // ⭐ CLICK INTERFACE
+    public interface OnComicClickListener {
+        void onComicClick(LibraryComic comic);
+    }
+
+    // ⭐ CONSTRUCTOR
+    public LibraryAdapter(List<LibraryComic> comics, OnComicClickListener listener) {
         this.comics = comics;
+        this.listener = listener;
     }
 
     @NonNull
@@ -39,20 +44,15 @@ public class LibraryAdapter extends RecyclerView.Adapter<LibraryAdapter.ViewHold
         holder.title.setText(comic.getName());
 
         holder.itemView.setOnClickListener(v -> {
-
-            Context context = v.getContext();
-
-            Intent intent = new Intent(context, ReaderActivity.class);
-            intent.putExtra("uri", comic.getUri());
-
-            context.startActivity(intent);
-
+            if (listener != null) {
+                listener.onComicClick(comic);
+            }
         });
     }
 
     @Override
     public int getItemCount() {
-        return comics.size();
+        return comics == null ? 0 : comics.size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

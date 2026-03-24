@@ -5,7 +5,9 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -14,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,22 +30,23 @@ public class ReaderActivity extends AppCompatActivity {
     LinearLayout menuLayout;
     RecyclerView recycler;
 
+    List<Bitmap> pages = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reader);
 
-        // ⭐ Get URI
-        comicUri = Uri.parse(getIntent().getStringExtra("uri"));
+        // ⭐ RECEIVE URI
+        comicUri = getIntent().getParcelableExtra("uri");
 
         if (comicUri == null) {
             finish();
             return;
         }
 
-        // ⭐ MENU OVERLAY
+        // ⭐ MENU
         menuLayout = findViewById(R.id.layoutMenu);
-
         FrameLayout root = findViewById(R.id.readerRoot);
 
         root.setOnClickListener(v -> {
@@ -52,26 +56,30 @@ public class ReaderActivity extends AppCompatActivity {
                 menuLayout.setVisibility(View.GONE);
         });
 
-        // ⭐ Recycler
         recycler = findViewById(R.id.recyclerPages);
 
         // ⭐ DEFAULT MODE
         recycler.setLayoutManager(
                 new LinearLayoutManager(this,
-                        LinearLayoutManager.VERTICAL, false)
+                        LinearLayoutManager.VERTICAL,
+                        false)
         );
 
-        // ⭐ LOAD REAL CBZ
-        loadCBZ();
+        // ⭐ LOAD REAL IMAGES
+        loadCBZImages();
 
-        // ⭐ Mode Buttons
+        // ⭐ SET ADAPTER
+        recycler.setAdapter(new PageAdapter());
+
+        // ⭐ MODE BUTTONS
         TextView btnVertical = findViewById(R.id.btnVertical);
         TextView btnHorizontal = findViewById(R.id.btnHorizontal);
 
         btnVertical.setOnClickListener(v -> {
             recycler.setLayoutManager(
                     new LinearLayoutManager(this,
-                            LinearLayoutManager.VERTICAL, false)
+                            LinearLayoutManager.VERTICAL,
+                            false)
             );
             menuLayout.setVisibility(View.GONE);
         });
@@ -79,7 +87,8 @@ public class ReaderActivity extends AppCompatActivity {
         btnHorizontal.setOnClickListener(v -> {
             recycler.setLayoutManager(
                     new LinearLayoutManager(this,
-                            LinearLayoutManager.HORIZONTAL, false)
+                            LinearLayoutManager.HORIZONTAL,
+                            false)
             );
             menuLayout.setVisibility(View.GONE);
         });
@@ -87,48 +96,91 @@ public class ReaderActivity extends AppCompatActivity {
         showReadingModeDialog();
     }
 
-    private void loadCBZ() {
+    private void loadCBZImages() {
 
-        new Thread(() -> {
+        try {
 
-            try {
+            InputStream is = getContentResolver().openInputStream(comicUri);
 
-                List<ComicPage> pages = new ArrayList<>();
+            ZipInputStream zis = new ZipInputStream(is);
 
-                InputStream is = getContentResolver().openInputStream(comicUri);
+            ZipEntry entry;
 
-                ZipInputStream zis = new ZipInputStream(is);
+            while ((entry = zis.getNextEntry()) != null) {
 
-                ZipEntry entry;
+                String name = entry.getName().toLowerCase();
 
-                while ((entry = zis.getNextEntry()) != null) {
+                if (name.endsWith(".jpg") ||
+                        name.endsWith(".png") ||
+                        name.endsWith(".webp")) {
 
-                    String name = entry.getName().toLowerCase();
+                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
-                    if (name.endsWith(".jpg") ||
-                            name.endsWith(".jpeg") ||
-                            name.endsWith(".png") ||
-                            name.endsWith(".webp")) {
+                    byte[] data = new byte[4096];
+                    int n;
 
-                        Bitmap bmp = BitmapFactory.decodeStream(zis);
-
-                        if (bmp != null) {
-                            pages.add(new ComicPage(bmp));
-                        }
+                    while ((n = zis.read(data)) != -1) {
+                        buffer.write(data, 0, n);
                     }
 
-                    zis.closeEntry();
+                    byte[] imageBytes = buffer.toByteArray();
+
+                    Bitmap bmp = BitmapFactory.decodeByteArray(
+                            imageBytes,
+                            0,
+                            imageBytes.length
+                    );
+
+                    if (bmp != null)
+                        pages.add(bmp);
                 }
 
-                runOnUiThread(() -> {
-                    recycler.setAdapter(new PageAdapter(pages));
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
+                zis.closeEntry();
             }
 
-        }).start();
+            zis.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class PageAdapter extends RecyclerView.Adapter<PageAdapter.Holder> {
+
+        @Override
+        public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+            ImageView img = new ImageView(parent.getContext());
+
+            img.setLayoutParams(new RecyclerView.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+
+            img.setAdjustViewBounds(true);
+
+            return new Holder(img);
+        }
+
+        @Override
+        public void onBindViewHolder(Holder holder, int position) {
+            holder.img.setImageBitmap(pages.get(position));
+        }
+
+        @Override
+        public int getItemCount() {
+            return pages.size();
+        }
+
+        class Holder extends RecyclerView.ViewHolder {
+
+            ImageView img;
+
+            Holder(View v) {
+                super(v);
+                img = (ImageView) v;
+            }
+        }
     }
 
     private void showReadingModeDialog() {
@@ -140,15 +192,21 @@ public class ReaderActivity extends AppCompatActivity {
                 .setItems(modes, (dialog, which) -> {
 
                     if (which == 0) {
+
                         recycler.setLayoutManager(
                                 new LinearLayoutManager(this,
-                                        LinearLayoutManager.VERTICAL, false)
+                                        LinearLayoutManager.VERTICAL,
+                                        false)
                         );
+
                     } else {
+
                         recycler.setLayoutManager(
                                 new LinearLayoutManager(this,
-                                        LinearLayoutManager.HORIZONTAL, false)
+                                        LinearLayoutManager.HORIZONTAL,
+                                        false)
                         );
+
                     }
 
                 })
