@@ -1,9 +1,12 @@
 package com.example.comicreaderapp;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,16 +16,9 @@ import java.util.List;
 public class LibraryAdapter extends RecyclerView.Adapter<LibraryAdapter.ViewHolder> {
 
     List<LibraryComic> comics;
-    OnComicClickListener listener;
 
-    // ⭐ CLICK INTERFACE
-    public interface OnComicClickListener {
-        void onComicClick(LibraryComic comic);
-    }
-
-    public LibraryAdapter(List<LibraryComic> comics, OnComicClickListener listener) {
+    public LibraryAdapter(List<LibraryComic> comics) {
         this.comics = comics;
-        this.listener = listener;
     }
 
     @NonNull
@@ -40,10 +36,17 @@ public class LibraryAdapter extends RecyclerView.Adapter<LibraryAdapter.ViewHold
 
         LibraryComic comic = comics.get(position);
 
-        holder.title.setText(comic.getTitle());
+        holder.title.setText(comic.getName());
 
         holder.itemView.setOnClickListener(v -> {
-            listener.onComicClick(comic);
+
+            Context context = v.getContext();
+
+            Intent intent = new Intent(context, ReaderActivity.class);
+            intent.putExtra("uri", comic.getUri());
+
+            context.startActivity(intent);
+
         });
     }
 

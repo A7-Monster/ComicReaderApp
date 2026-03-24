@@ -96,14 +96,7 @@ public class LibraryFragment extends Fragment {
 
         recycler.setLayoutManager(new GridLayoutManager(getContext(), 3));
 
-        adapter = new LibraryAdapter(libraryList, comic -> {
-
-            Intent intent = new Intent(getContext(), ReaderActivity.class);
-            intent.putExtra("uri", comic.getUri().toString());
-            intent.putExtra("title", comic.getTitle());
-            startActivity(intent);
-
-        });
+        adapter = new LibraryAdapter(libraryList);
 
         recycler.setAdapter(adapter);
 

@@ -4,16 +4,16 @@ import android.net.Uri;
 
 public class LibraryComic {
 
-    String title;
+    String name;
     Uri uri;
 
-    public LibraryComic(String title, Uri uri) {
-        this.title = title;
+    public LibraryComic(String name, Uri uri) {
+        this.name = name;
         this.uri = uri;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
     public Uri getUri() {
