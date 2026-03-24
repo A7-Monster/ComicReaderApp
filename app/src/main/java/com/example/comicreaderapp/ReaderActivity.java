@@ -48,6 +48,12 @@ public class ReaderActivity extends AppCompatActivity {
         // ⭐ Recycler
         recycler = findViewById(R.id.recyclerPages);
 
+        // ⭐ IMPORTANT → SET DEFAULT MODE FIRST (VERY IMPORTANT)
+        recycler.setLayoutManager(
+                new LinearLayoutManager(this,
+                        LinearLayoutManager.VERTICAL, false)
+        );
+
         // ⭐ TEMP Adapter (Dummy Pages)
         recycler.setAdapter(new RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
