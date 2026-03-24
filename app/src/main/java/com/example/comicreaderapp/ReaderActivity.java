@@ -3,6 +3,7 @@ package com.example.comicreaderapp;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,7 +25,13 @@ public class ReaderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reader);
 
+        // ⭐ Get URI
         comicUri = getIntent().getParcelableExtra("uri");
+
+        if (comicUri == null) {
+            finish();
+            return;
+        }
 
         // ⭐ MENU OVERLAY
         menuLayout = findViewById(R.id.layoutMenu);
@@ -38,10 +45,35 @@ public class ReaderActivity extends AppCompatActivity {
                 menuLayout.setVisibility(View.GONE);
         });
 
-        // ⭐ RECYCLER
+        // ⭐ Recycler
         recycler = findViewById(R.id.recyclerPages);
 
-        // ⭐ MODE BUTTONS
+        // ⭐ TEMP Adapter (Dummy Pages)
+        recycler.setAdapter(new RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+            @Override
+            public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+                TextView tv = new TextView(parent.getContext());
+                tv.setTextColor(0xffffffff);
+                tv.setTextSize(32);
+                tv.setPadding(80, 400, 80, 400);
+
+                return new RecyclerView.ViewHolder(tv) {};
+            }
+
+            @Override
+            public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+                ((TextView) holder.itemView).setText("Page " + (position + 1));
+            }
+
+            @Override
+            public int getItemCount() {
+                return 20;
+            }
+        });
+
+        // ⭐ Mode Buttons
         TextView btnVertical = findViewById(R.id.btnVertical);
         TextView btnHorizontal = findViewById(R.id.btnHorizontal);
 
