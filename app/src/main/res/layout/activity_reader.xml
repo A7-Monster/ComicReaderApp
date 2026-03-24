@@ -1,71 +1,36 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/readerRoot"
+<LinearLayout
+    android:id="@+id/layoutMenu"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#000">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#AA000000"
+    android:padding="16dp"
+    android:visibility="gone">
 
-    <!-- ⭐ Pages Recycler -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerPages"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose Reading Mode"
+        android:textColor="#fff"
+        android:textSize="18sp"
+        android:layout_marginBottom="12dp"/>
 
-    <!-- ⭐ Reading Mode Menu Overlay -->
-    <LinearLayout
-        android:id="@+id/layoutMenu"
+    <TextView
+        android:id="@+id/btnVertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="#AA000000"
-        android:padding="16dp"
-        android:visibility="gone">
+        android:text="Vertical Scroll"
+        android:textColor="#fff"
+        android:textSize="16sp"
+        android:padding="8dp"/>
 
-        <TextView
-            android:text="Choose Reading Mode"
-            android:textColor="#fff"
-            android:textSize="18sp"
-            android:layout_marginBottom="12dp"/>
-
-        <TextView
-            android:id="@+id/btnVertical"
-            android:text="Vertical Scroll"
-            android:textColor="#fff"
-            android:textSize="16sp"
-            android:padding="8dp"/>
-
-        <TextView
-            android:id="@+id/btnHorizontal"
-            android:text="Horizontal Swipe"
-            android:textColor="#fff"
-            android:textSize="16sp"
-            android:padding="8dp"/>
-
-    </LinearLayout>
-
-    <!-- ⭐ Bottom Progress -->
-    <LinearLayout
-        android:id="@+id/layoutProgress"
+    <TextView
+        android:id="@+id/btnHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:orientation="vertical"
-        android:background="#AA000000"
-        android:padding="8dp">
+        android:text="Horizontal Swipe"
+        android:textColor="#fff"
+        android:textSize="16sp"
+        android:padding="8dp"/>
 
-        <SeekBar
-            android:id="@+id/seekPages"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <TextView
-            android:id="@+id/tvPage"
-            android:text="1 / 14"
-            android:textColor="#fff"
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-    </LinearLayout>
-
-</FrameLayout>
+</LinearLayout>
