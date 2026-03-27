@@ -3,6 +3,7 @@ package com.example.comicreaderapp;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,12 +16,10 @@ public class LibraryAdapter extends RecyclerView.Adapter<LibraryAdapter.ViewHold
     List<LibraryComic> comics;
     OnComicClickListener listener;
 
-    // ⭐ CLICK INTERFACE
     public interface OnComicClickListener {
         void onComicClick(LibraryComic comic);
     }
 
-    // ⭐ CONSTRUCTOR
     public LibraryAdapter(List<LibraryComic> comics, OnComicClickListener listener) {
         this.comics = comics;
         this.listener = listener;
@@ -43,25 +42,31 @@ public class LibraryAdapter extends RecyclerView.Adapter<LibraryAdapter.ViewHold
 
         holder.title.setText(comic.getName());
 
+        // ⭐ SHOW COVER
+        if (comic.getCover() != null) {
+            holder.image.setImageBitmap(comic.getCover());
+        }
+
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
+            if (listener != null)
                 listener.onComicClick(comic);
-            }
         });
     }
 
     @Override
     public int getItemCount() {
-        return comics == null ? 0 : comics.size();
+        return comics.size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView title;
+        ImageView image; // ⭐ NEW
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.tvComicName);
+            image = itemView.findViewById(R.id.imageCover); // ⭐ NEW
         }
     }
 }

@@ -2,6 +2,8 @@ package com.example.comicreaderapp;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
@@ -18,8 +20,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class LibraryFragment extends Fragment {
 
@@ -27,8 +33,6 @@ public class LibraryFragment extends Fragment {
     LibraryAdapter adapter;
 
     private ActivityResultLauncher<Intent> filePickerLauncher;
-
-    public LibraryFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,7 +52,10 @@ public class LibraryFragment extends Fragment {
 
                             String name = getFileName(uri);
 
-                            libraryList.add(new LibraryComic(name, uri));
+                            // ⭐ EXTRACT COVER
+                            Bitmap cover = extractCover(uri);
+
+                            libraryList.add(new LibraryComic(name, uri, cover));
 
                             adapter.notifyDataSetChanged();
 
@@ -86,9 +93,6 @@ public class LibraryFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_library, container, false);
 
-        // ⭐ STATUS BAR FIX (VERY IMPORTANT)
-        view.setPadding(0, getStatusBarHeight(), 0, 0);
-
         RecyclerView recycler = view.findViewById(R.id.recyclerLibrary);
 
         recycler.setLayoutManager(new GridLayoutManager(getContext(), 3));
@@ -96,9 +100,7 @@ public class LibraryFragment extends Fragment {
         adapter = new LibraryAdapter(libraryList, comic -> {
 
             Intent intent = new Intent(getContext(), ReaderActivity.class);
-
             intent.putExtra("uri", comic.getUri());
-
             startActivity(intent);
         });
 
@@ -117,10 +119,8 @@ public class LibraryFragment extends Fragment {
         intent.setType("*/*");
 
         String[] mimeTypes = {
-                "application/pdf",
                 "application/zip",
-                "application/x-cbz",
-                "image/*"
+                "application/x-cbz"
         };
 
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
@@ -129,13 +129,47 @@ public class LibraryFragment extends Fragment {
         filePickerLauncher.launch(intent);
     }
 
-    // ⭐ GET STATUS BAR HEIGHT
-    private int getStatusBarHeight() {
-        int result = 0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
+    // ⭐ COVER EXTRACTION
+    private Bitmap extractCover(Uri uri) {
+
+        try {
+
+            InputStream is = getActivity().getContentResolver().openInputStream(uri);
+            ZipInputStream zis = new ZipInputStream(is);
+
+            ZipEntry entry;
+
+            while ((entry = zis.getNextEntry()) != null) {
+
+                String name = entry.getName().toLowerCase();
+
+                if (name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".webp")) {
+
+                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+                    byte[] data = new byte[4096];
+                    int n;
+
+                    while ((n = zis.read(data)) != -1) {
+                        buffer.write(data, 0, n);
+                    }
+
+                    byte[] imageBytes = buffer.toByteArray();
+
+                    zis.close();
+
+                    return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                }
+
+                zis.closeEntry();
+            }
+
+            zis.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return result;
+
+        return null;
     }
 }
