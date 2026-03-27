@@ -95,7 +95,7 @@ public class LibraryFragment extends Fragment {
 
         RecyclerView recycler = view.findViewById(R.id.recyclerLibrary);
 
-        recycler.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        recycler.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
         adapter = new LibraryAdapter(libraryList, comic -> {
 

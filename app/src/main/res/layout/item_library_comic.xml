@@ -3,18 +3,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="6dp">
+    android:layout_margin="6dp">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:radius="8dp"
-        android:elevation="4dp">
+        android:radius="10dp"
+        android:elevation="6dp">
 
         <ImageView
             android:id="@+id/imageCover"
             android:layout_width="match_parent"
-            android:layout_height="140dp"
+            android:layout_height="200dp"
             android:scaleType="centerCrop" />
     </androidx.cardview.widget.CardView>
 
@@ -22,8 +22,7 @@
         android:id="@+id/tvComicName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Comic Name"
-        android:textSize="13sp"
+        android:textSize="14sp"
         android:textColor="#000"
         android:paddingTop="6dp"
         android:maxLines="2"
